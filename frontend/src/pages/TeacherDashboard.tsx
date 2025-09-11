@@ -7,20 +7,29 @@ export default function TeacherDashboard() {
   const [quizzes, setQuizzes] = useState<Quiz[]>([])
   const [title, setTitle] = useState('')
   const [difficulty, setDifficulty] = useState<'EASY'|'MEDIUM'|'HARD'>('EASY')
+  const [students, setStudents] = useState<any[]>([])
+  const [summary, setSummary] = useState<any | null>(null)
+  const [attempts, setAttempts] = useState<any[]>([])
 
   async function load() {
-    const r = await axios.get('/api/quizzes', { withCredentials: true })
+    const r = await axios.get('/api/quizzes')
     setQuizzes(r.data)
+    const s = await axios.get('/api/analytics/students')
+    setStudents(s.data)
+    const sum = await axios.get('/api/analytics/summary')
+    setSummary(sum.data)
+    const at = await axios.get('/api/analytics/attempts')
+    setAttempts(at.data)
   }
   useEffect(() => { load() }, [])
 
   async function createQuiz(e: React.FormEvent) {
     e.preventDefault()
-    await axios.post('/api/quizzes', { title, difficulty }, { withCredentials: true })
+    await axios.post('/api/quizzes', { title, difficulty })
     setTitle(''); setDifficulty('EASY'); load()
   }
   async function remove(id: number) {
-    await axios.delete(`/api/quizzes/${id}`, { withCredentials: true }); load()
+    await axios.delete(`/api/quizzes/${id}`); load()
   }
 
   return (
@@ -52,6 +61,44 @@ export default function TeacherDashboard() {
             </li>
           ))}
         </ul>
+      </div>
+      <div className="card brutal" style={{gridColumn:'1 / -1'}}>
+        <h3 style={{marginTop:0}}>Students</h3>
+        <div className="grid" style={{gridTemplateColumns:'1fr 1fr 1fr 1fr'}}>
+          <div><b>Name</b></div><div><b>Attempts</b></div><div><b>Avg Score</b></div><div><b>Id</b></div>
+          {students.map(s => (
+            <>
+              <div>{s.name}</div>
+              <div>{s.attempts}</div>
+              <div>{Math.round(s.avgScore)}</div>
+              <div>{s.studentId}</div>
+            </>
+          ))}
+        </div>
+      </div>
+
+      <div className="card brutal" style={{gridColumn:'1 / -1'}}>
+        <h3 style={{marginTop:0}}>Analytics</h3>
+        {summary && (
+          <div style={{display:'flex', gap:24}}>
+            <div><b>Attempts</b><div>{summary.attemptCount}</div></div>
+            <div><b>Avg</b><div>{Math.round(summary.avgScore)}</div></div>
+            <div><b>Best</b><div>{summary.maxScore}</div></div>
+            <div><b>Worst</b><div>{summary.minScore}</div></div>
+          </div>
+        )}
+        <h4>Recent Attempts</h4>
+        <div className="grid" style={{gridTemplateColumns:'1fr 1fr 1fr 1fr'}}>
+          <div><b>Student</b></div><div><b>Quiz</b></div><div><b>Score</b></div><div><b>Time</b></div>
+          {attempts.map(a => (
+            <>
+              <div>{a.studentName}</div>
+              <div>{a.quizTitle}</div>
+              <div>{a.score}</div>
+              <div>{new Date(a.createdAt).toLocaleString()}</div>
+            </>
+          ))}
+        </div>
       </div>
     </div>
   )

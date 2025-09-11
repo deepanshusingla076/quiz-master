@@ -2,10 +2,9 @@ package com.example.quiz.web;
 
 import com.example.quiz.domain.Attempt;
 import com.example.quiz.domain.User;
-import com.example.quiz.security.SessionUser;
 import com.example.quiz.service.AttemptService;
 import com.example.quiz.service.UserService;
-import jakarta.servlet.http.HttpSession;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,16 +21,19 @@ public class AttemptController {
         this.userService = userService;
     }
 
-    private User sessionUser(HttpSession session) { return userService.findById((Long)session.getAttribute("userId")).orElseThrow(); }
+    private User getCurrentUser(Authentication authentication) { 
+        String email = authentication.getName();
+        return userService.findByEmail(email).orElseThrow();
+    }
 
     @PostMapping("/{quizId}")
-    public Attempt attempt(@PathVariable Long quizId, HttpSession session) {
-        return attemptService.attempt(sessionUser(session), quizId);
+    public Attempt attempt(@PathVariable Long quizId, Authentication authentication) {
+        return attemptService.attempt(getCurrentUser(authentication), quizId);
     }
 
     @GetMapping("/mine")
-    public List<Attempt> mine(HttpSession session) {
-        return attemptService.attemptsFor(sessionUser(session));
+    public List<Attempt> mine(Authentication authentication) {
+        return attemptService.attemptsFor(getCurrentUser(authentication));
     }
 }
 

@@ -13,23 +13,44 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType>({} as any)
 
+// Configure axios to include JWT token in requests
+axios.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
+  
   useEffect(() => {
-    axios.get('/api/auth/me', { withCredentials: true }).then(r => setUser(r.data)).catch(() => setUser(null))
+    const token = localStorage.getItem('token')
+    if (token) {
+      axios.get('/api/auth/me').then(r => setUser(r.data)).catch(() => {
+        localStorage.removeItem('token')
+        setUser(null)
+      })
+    }
   }, [])
 
   async function login(email: string, password: string) {
-    await axios.post('/api/auth/login', { email, password }, { withCredentials: true })
-    const me = await axios.get('/api/auth/me', { withCredentials: true })
-    setUser(me.data)
+    const response = await axios.post('/api/auth/login', { email, password })
+    const { token, user: userData } = response.data
+    localStorage.setItem('token', token)
+    setUser(userData)
   }
+  
   async function signup(name: string, email: string, password: string, role: Role) {
-    await axios.post('/api/auth/signup', { name, email, password, role }, { withCredentials: true })
-    await login(email, password)
+    const response = await axios.post('/api/auth/signup', { name, email, password, role })
+    const { token, user: userData } = response.data
+    localStorage.setItem('token', token)
+    setUser(userData)
   }
+  
   async function logout() {
-    await axios.post('/api/auth/logout', {}, { withCredentials: true })
+    localStorage.removeItem('token')
     setUser(null)
   }
 

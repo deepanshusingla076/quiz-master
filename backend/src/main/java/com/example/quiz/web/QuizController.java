@@ -4,7 +4,7 @@ import com.example.quiz.domain.Quiz;
 import com.example.quiz.domain.User;
 import com.example.quiz.service.QuizService;
 import com.example.quiz.service.UserService;
-import jakarta.servlet.http.HttpSession;
+import org.springframework.security.core.Authentication;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,13 +25,12 @@ public class QuizController {
 
     record CreateQuizRequest(@NotBlank String title, Quiz.Difficulty difficulty) {}
 
-    private User sessionUser(HttpSession session) { return userService.findById((Long)session.getAttribute("userId")).orElseThrow(); }
 
     @GetMapping
     public List<Quiz> all() { return quizService.all(); }
 
     @PostMapping
-    public Quiz create(@RequestBody CreateQuizRequest req, HttpSession session) {
+    public Quiz create(@RequestBody CreateQuizRequest req, Authentication authentication) {
         // role enforcement can be added later or via Security
         return quizService.create(req.title(), req.difficulty());
     }
