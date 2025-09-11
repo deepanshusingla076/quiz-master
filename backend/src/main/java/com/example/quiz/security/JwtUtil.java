@@ -3,6 +3,7 @@ package com.example.quiz.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -12,8 +13,11 @@ import java.util.function.Function;
 
 @Component
 public class JwtUtil {
-    private static final String SECRET_KEY = "mySecretKey123456789012345678901234567890";
-    private static final int TOKEN_VALIDITY = 3600 * 24; // 24 hours
+    @Value("${app.jwt.secret:change-me}")
+    private String secretKey;
+
+    @Value("${app.jwt.ttlSeconds:86400}")
+    private int tokenValiditySeconds; // 24 hours by default
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -30,7 +34,7 @@ public class JwtUtil {
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                .setSigningKey(SECRET_KEY)
+                .setSigningKey(secretKey)
                 .parseClaimsJws(token)
                 .getBody();
     }
@@ -50,8 +54,8 @@ public class JwtUtil {
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + TOKEN_VALIDITY * 1000))
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .setExpiration(new Date(System.currentTimeMillis() + (long) tokenValiditySeconds * 1000))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
 
