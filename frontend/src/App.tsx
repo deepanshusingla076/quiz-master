@@ -13,12 +13,25 @@ function ProtectedRoute({ children, role }: { children: JSX.Element, role?: 'TEA
 }
 
 function Shell() {
-  const { user, logout } = useAuth()
+  const { user, loading, logout } = useAuth()
   const navigate = useNavigate()
+  
   useEffect(() => {
     // redirect post-login
     if (user) navigate(user.role === 'TEACHER' ? '/teacher' : '/student')
   }, [user])
+  
+  if (loading) {
+    return (
+      <div className="container">
+        <div style={{textAlign: 'center', padding: '50px'}}>
+          <h1 style={{fontFamily:'Impact, Haettenschweiler, Arial Black', letterSpacing:1}}>QUIZ//PLATFORM</h1>
+          <p>Loading...</p>
+        </div>
+      </div>
+    )
+  }
+  
   return (
     <div className="container">
       <div className="header">

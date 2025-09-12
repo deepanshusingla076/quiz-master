@@ -17,22 +17,24 @@ export default function Landing() {
       if (isSignup) await signup(name, email, password, role)
       else await login(email, password)
     } catch (err: any) {
-      setError(err?.response?.data?.message || 'Auth failed')
+      console.error('Auth error:', err)
+      setError(err?.response?.data?.message || err?.message || 'Auth failed')
     }
   }
 
   return (
-    <div className="hero">
-      <div className="card brutal">
-        <h2 style={{marginTop:0}}>We make quizzes feel like a showdown.</h2>
-        <p>Brutal visuals. Clean flows. Built for speed.</p>
-        <ul>
-          <li>Role-based dashboards</li>
-          <li>Real-time leaderboard</li>
-          <li>Responsive by default</li>
-        </ul>
-      </div>
-      <form className="card brutal" onSubmit={onSubmit}>
+    <div>
+      <section className="hero">
+        <div className="card brutal">
+          <h2 style={{marginTop:0}}>We make quizzes feel like a showdown.</h2>
+          <p>Brutal visuals. Clean flows. Built for speed.</p>
+          <ul>
+            <li>Role-based dashboards</li>
+            <li>Real-time leaderboard</li>
+            <li>Responsive by default</li>
+          </ul>
+        </div>
+        <form className="card brutal" onSubmit={onSubmit}>
         <h3 style={{marginTop:0}}>{isSignup ? 'Create account' : 'Welcome back'}</h3>
         {isSignup && (
           <div style={{marginBottom:12}}>
@@ -62,7 +64,18 @@ export default function Landing() {
         <div style={{marginTop:12}}>
           <a onClick={()=>setIsSignup(!isSignup)} style={{cursor:'pointer', textDecoration:'underline'}}> {isSignup ? 'Have an account? Login' : 'New here? Sign up'}</a>
         </div>
-      </form>
+        </form>
+      </section>
+
+      <section className="card brutal" style={{marginTop:24}}>
+        <h3 style={{marginTop:0}}>About</h3>
+        <p>QUIZ//PLATFORM is a modern quiz system for schools and teams, focused on speed, clarity, and real-time collaboration.</p>
+      </section>
+
+      <section className="card brutal" style={{marginTop:24}}>
+        <h3 style={{marginTop:0}}>Contact</h3>
+        <p>Email us at <a href="mailto:support@example.com">support@example.com</a></p>
+      </section>
     </div>
   )
 }

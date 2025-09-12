@@ -6,6 +6,7 @@ type User = { id: number; name: string; role: Role }
 
 type AuthContextType = {
   user: User | null
+  loading: boolean
   login: (email: string, password: string) => Promise<void>
   signup: (name: string, email: string, password: string, role: Role) => Promise<void>
   logout: () => Promise<void>
@@ -24,14 +25,22 @@ axios.interceptors.request.use((config) => {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
   
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (token) {
-      axios.get('/api/auth/me').then(r => setUser(r.data)).catch(() => {
+      axios.get('/api/auth/me').then(r => {
+        setUser(r.data)
+        setLoading(false)
+      }).catch((err) => {
+        console.log('Auth check failed:', err)
         localStorage.removeItem('token')
         setUser(null)
+        setLoading(false)
       })
+    } else {
+      setLoading(false)
     }
   }, [])
 
@@ -54,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null)
   }
 
-  return <AuthContext.Provider value={{ user, login, signup, logout }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ user, loading, login, signup, logout }}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() { return useContext(AuthContext) }

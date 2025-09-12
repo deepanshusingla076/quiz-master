@@ -28,7 +28,7 @@ body {
   cursor: pointer;
 }
 
-.container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+.container { max-width: 1200px; margin: 0 auto; padding: 24px; }
 .grid { display: grid; gap: 16px; }
 
 .header {
@@ -38,15 +38,22 @@ body {
 
 .hero {
   display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; margin-top: 24px;
+  align-items: start;
 }
 
 @media (max-width: 800px) {
   .hero { grid-template-columns: 1fr; }
 }
 
-.card { background: white; padding: 16px; }
+.card { background: white; padding: 20px; border-radius: 8px; }
 
-input, select { width: 100%; padding: 12px; border: 3px solid var(--fg); background: #fff; }
+input, select { width: 100%; padding: 12px; border: 3px solid var(--fg); background: #fff; border-radius: 6px; }
 label { font-weight: 800; font-size: 12px; text-transform: uppercase; }
+
+/* Dashboard polish */
+.header h1 { font-size: 28px; }
+.card h3 { font-size: 18px; }
+.btn.brutal { transition: transform .05s ease; }
+.btn.brutal:active { transform: translate(1px,1px); box-shadow: 4px 4px 0 var(--fg); }
 
 

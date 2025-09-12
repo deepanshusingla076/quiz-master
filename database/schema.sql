@@ -1,9 +1,11 @@
--- Database schema for QUIZ//PLATFORM
+-- Clean SQL schema for QUIZ//PLATFORM
 
-CREATE DATABASE IF NOT EXISTS quiz_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+DROP DATABASE IF EXISTS quiz_db;
+CREATE DATABASE quiz_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE quiz_db;
 
-CREATE TABLE IF NOT EXISTS users (
+-- Users table
+CREATE TABLE users (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   email VARCHAR(255) NOT NULL UNIQUE,
@@ -11,20 +13,23 @@ CREATE TABLE IF NOT EXISTS users (
   role VARCHAR(16) NOT NULL
 ) ENGINE=InnoDB;
 
-CREATE TABLE IF NOT EXISTS quiz (
+-- Quizzes table
+CREATE TABLE quiz (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
   difficulty VARCHAR(16) NOT NULL
 ) ENGINE=InnoDB;
 
-CREATE TABLE IF NOT EXISTS attempt (
+-- Attempts table
+CREATE TABLE attempt (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   student_id BIGINT NOT NULL,
   quiz_id BIGINT NOT NULL,
   score INT NOT NULL,
-  created_at DATETIME(6),
-  CONSTRAINT fk_attempt_student FOREIGN KEY (student_id) REFERENCES users(id),
-  CONSTRAINT fk_attempt_quiz FOREIGN KEY (quiz_id) REFERENCES quiz(id)
+  created_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
+  CONSTRAINT fk_attempt_student FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT fk_attempt_quiz FOREIGN KEY (quiz_id) REFERENCES quiz(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
+
 
 
