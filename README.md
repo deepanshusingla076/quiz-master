@@ -226,4 +226,7 @@ export default defineConfig({
 3. **Open Browser**: http://localhost:5173
 4. **Login**: Use `alice@example.com` / `Passw0rd!`
 
+additional we add microservices 
+
+
 **Your Quiz Platform is now running! 🚀**
