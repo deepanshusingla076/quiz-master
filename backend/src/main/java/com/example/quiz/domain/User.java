@@ -1,5 +1,6 @@
 package com.example.quiz.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -32,10 +33,12 @@ public class User {
 
     // Relationship: Student attempts quizzes
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Attempt> attempts;
 
     // Relationship: Teacher creates quizzes
     @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Quiz> createdQuizzes;
 }
 

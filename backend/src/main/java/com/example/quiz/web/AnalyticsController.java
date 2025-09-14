@@ -1,16 +1,13 @@
 package com.example.quiz.web;
 
 import com.example.quiz.domain.Attempt;
-import com.example.quiz.domain.Role;
 import com.example.quiz.domain.User;
+import com.example.quiz.domain.Role;
 import com.example.quiz.repo.AttemptRepository;
 import com.example.quiz.repo.UserRepository;
+import com.example.quiz.microservices.ResultService;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.DoubleSummaryStatistics;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -19,10 +16,12 @@ import java.util.stream.Collectors;
 public class AnalyticsController {
     private final AttemptRepository attemptRepository;
     private final UserRepository userRepository;
+    private final ResultService resultService;
 
-    public AnalyticsController(AttemptRepository attemptRepository, UserRepository userRepository) {
+    public AnalyticsController(AttemptRepository attemptRepository, UserRepository userRepository, ResultService resultService) {
         this.attemptRepository = attemptRepository;
         this.userRepository = userRepository;
+        this.resultService = resultService;
     }
 
     @GetMapping("/summary")
@@ -67,6 +66,11 @@ public class AnalyticsController {
             result.put("createdAt", a.getCreatedAt());
             return result;
         }).toList();
+    }
+
+    @GetMapping("/leaderboard")
+    public List<Map<String, Object>> getLeaderboard() {
+        return resultService.getLeaderboard();
     }
 }
 

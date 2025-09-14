@@ -1,5 +1,6 @@
 package com.example.quiz.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -22,6 +23,7 @@ public class Question {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "quiz_id")
+    @JsonIgnore
     private Quiz quiz;
 
     @ElementCollection

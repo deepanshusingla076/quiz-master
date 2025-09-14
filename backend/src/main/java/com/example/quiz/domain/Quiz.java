@@ -1,5 +1,6 @@
 package com.example.quiz.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -23,10 +24,12 @@ public class Quiz {
     private Difficulty difficulty;
 
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Question> questions;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
+    @JsonIgnore
     private User createdBy;
 
     public enum Difficulty { EASY, MEDIUM, HARD }

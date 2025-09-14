@@ -83,13 +83,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
           const response = await axios.get('/api/auth/me')
           setUser(response.data)
-        } catch (err) {
+        } catch (err: any) {
           console.log('Auth check failed:', err)
-          
-          // Try to refresh the token
-          const refreshSuccessful = await refreshToken()
-          if (!refreshSuccessful) {
-            // If refresh failed, clear everything
+          // Only clear auth on 401/403, keep tokens for network errors
+          if (err?.response?.status === 401 || err?.response?.status === 403) {
             localStorage.removeItem('token')
             localStorage.removeItem('refreshToken')
             setUser(null)
