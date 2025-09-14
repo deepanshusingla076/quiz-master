@@ -110,6 +110,7 @@ You can configure the application using environment variables:
 
 ### Database Configuration
 
+<<<<<<< HEAD
 Configure the application using environment variables or update `backend/src/main/resources/application.properties`:
 
 **Environment Variables:**
@@ -162,3 +163,9 @@ gemini.api.key=your-gemini-api-key-here
 ## License
 
 This project is licensed under the MIT License.
+=======
+additional we add microservices 
+
+
+**Your Quiz Platform is now running! 🚀**
+>>>>>>> 8cbcb97fc04f657d3f014d301fa3c4a6dbb66783
