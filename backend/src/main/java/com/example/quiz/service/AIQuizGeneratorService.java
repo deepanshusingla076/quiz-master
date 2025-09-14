@@ -39,6 +39,29 @@ public class AIQuizGeneratorService {
     private String apiUrl;
 
     /**
+     * Generates a quiz using the Gemini API
+     * 
+     * @param prompt The prompt for question generation
+     * @param difficulty The difficulty level
+     * @return A QuestionBank object with generated questions
+     */
+    public QuestionBank generateQuiz(String prompt, String difficulty) {
+        try {
+            // Create the prompt for Gemini API
+            String fullPrompt = createPrompt(prompt, difficulty, 5);
+            
+            // Call Gemini API
+            String response = callGeminiAPI(fullPrompt);
+            
+            // Parse the response
+            return parseResponse(response, prompt, difficulty);
+        } catch (Exception e) {
+            log.error("Error generating quiz", e);
+            throw new RuntimeException("Failed to generate quiz using AI", e);
+        }
+    }
+
+    /**
      * Generates a question bank using the Gemini API
      * 
      * @param subject The subject for the questions
@@ -79,6 +102,10 @@ public class AIQuizGeneratorService {
     }
 
     private String callGeminiAPI(String prompt) {
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            throw new RuntimeException("Gemini API key is not configured. Please set gemini.api.key in application.properties");
+        }
+        
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         

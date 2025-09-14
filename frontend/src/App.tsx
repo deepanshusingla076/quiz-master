@@ -20,7 +20,7 @@ function Shell() {
   useEffect(() => {
     // redirect post-login
     if (user) navigate(user.role === 'TEACHER' ? '/teacher' : '/student')
-  }, [user])
+  }, [user, navigate])
   
   if (loading) {
     return (

@@ -3,6 +3,7 @@ import axios from 'axios'
 import Modal from '../components/Modal'
 import AIQuizGenerator from '../components/AIQuizGenerator'
 import AnalyticsDashboard from '../components/AnalyticsDashboard'
+import QuestionEditor from '../components/QuestionEditor'
 
 type Quiz = { id: number; title: string; difficulty: 'EASY'|'MEDIUM'|'HARD' }
 type Question = { id?: number; text: string; options: { text: string; correct: boolean }[] }
@@ -11,16 +12,13 @@ export default function TeacherDashboard() {
   const [quizzes, setQuizzes] = useState<Quiz[]>([])
   const [title, setTitle] = useState('')
   const [difficulty, setDifficulty] = useState<'EASY'|'MEDIUM'|'HARD'>('EASY')
-  const [students, setStudents] = useState<any[]>([])
-  const [summary, setSummary] = useState<any | null>(null)
-  const [attempts, setAttempts] = useState<any[]>([])
   const [questionModalOpen, setQuestionModalOpen] = useState(false)
   const [editingQuizId, setEditingQuizId] = useState<number | null>(null)
   const [questions, setQuestions] = useState<Question[]>([])
-  const [aiBusy, setAiBusy] = useState(false)
-  const [aiPrompt, setAiPrompt] = useState('')
   const [showAIGenerator, setShowAIGenerator] = useState(false)
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
+  const [students, setStudents] = useState<any[]>([])
+  const [summary, setSummary] = useState<any | null>(null)
+  const [attempts, setAttempts] = useState<any[]>([])
 
   async function load() {
     try {
@@ -82,7 +80,6 @@ export default function TeacherDashboard() {
     try {
       const r = await axios.get(`/api/quiz/${quizId}/questions`)
       setQuestions(r.data || [])
-      setCurrentQuestionIndex(0)
       setQuestionModalOpen(true)
     } catch (error) {
       console.error('Error loading questions:', error)
@@ -102,84 +99,51 @@ export default function TeacherDashboard() {
       ]
     }
     setQuestions(prev => [...prev, newQuestion])
-    setCurrentQuestionIndex(questions.length)
   }
 
-  function nextQuestion() {
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1)
-    }
+  function updateQuestion(index: number, updatedQuestion: Question) {
+    setQuestions(prev => prev.map((q, i) => i === index ? updatedQuestion : q))
   }
 
-  function prevQuestion() {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1)
-    }
-  }
-
-  function updateCurrentQuestion(updatedQuestion: Question) {
-    setQuestions(prev => prev.map((q, i) => i === currentQuestionIndex ? updatedQuestion : q))
-  }
-
-  function deleteCurrentQuestion() {
+  function deleteQuestion(index: number) {
     if (window.confirm('Are you sure you want to delete this question?')) {
-      setQuestions(prev => prev.filter((_, i) => i !== currentQuestionIndex))
-      if (currentQuestionIndex >= questions.length - 1) {
-        setCurrentQuestionIndex(Math.max(0, currentQuestionIndex - 1))
-      }
+      setQuestions(prev => prev.filter((_, i) => i !== index))
     }
   }
 
   async function saveQuestions() {
     if (!editingQuizId) return
+    
+    // Validate questions before saving
+    const validQuestions = questions.filter(q => 
+      q.text.trim() && 
+      q.options.length === 4 && 
+      q.options.every(opt => opt.text.trim()) &&
+      q.options.some(opt => opt.correct)
+    )
+    
+    if (validQuestions.length === 0) {
+      alert('Please add at least one complete question with all options filled and one correct answer selected.')
+      return
+    }
+    
+    if (validQuestions.length !== questions.length) {
+      if (!confirm(`${questions.length - validQuestions.length} incomplete questions will be skipped. Continue?`)) {
+        return
+      }
+    }
+    
     try {
-      await axios.put(`/api/quiz/${editingQuizId}/questions`, questions)
+      await axios.put(`/api/quiz/${editingQuizId}/questions`, validQuestions)
+      alert(`${validQuestions.length} questions saved successfully!`)
       setQuestionModalOpen(false)
       load()
     } catch (error) {
       console.error('Error saving questions:', error)
+      alert('Error saving questions. Please try again.')
     }
   }
 
-  async function generateWithAI() {
-    if (!editingQuizId) return
-    try {
-      setAiBusy(true)
-      const r = await axios.post(`/api/quiz/${editingQuizId}/ai-generate`, { 
-        difficulty, 
-        prompt: aiPrompt || 'Generate questions about general knowledge' 
-      })
-      setQuestions(r.data)
-      setCurrentQuestionIndex(0)
-      setAiPrompt('')
-    } catch (error) {
-      console.error('Error generating AI questions:', error)
-      // Fallback to mock questions
-      setQuestions([
-        {
-          text: 'What is the capital of France?',
-          options: [
-            { text: 'Paris', correct: true },
-            { text: 'London', correct: false },
-            { text: 'Berlin', correct: false },
-            { text: 'Madrid', correct: false }
-          ]
-        },
-        {
-          text: 'What is 2 + 2?',
-          options: [
-            { text: '3', correct: false },
-            { text: '4', correct: true },
-            { text: '5', correct: false },
-            { text: '6', correct: false }
-          ]
-        }
-      ])
-      setCurrentQuestionIndex(0)
-    } finally {
-      setAiBusy(false)
-    }
-  }
 
   async function remove(id: number) {
     if (window.confirm('Are you sure you want to delete this quiz?')) {
@@ -192,7 +156,6 @@ export default function TeacherDashboard() {
     }
   }
 
-  const currentQuestion = questions[currentQuestionIndex] || { text: '', options: [] }
 
   return (
     <>
@@ -255,90 +218,26 @@ export default function TeacherDashboard() {
       <div className="question-controls">
         <div className="save-controls">
           <button className="btn brutal btn-primary" onClick={saveQuestions}>Save All Questions</button>
+          <button className="btn brutal" onClick={addQuestion}>Add New Question</button>
         </div>
       </div>
 
-      {questions.length > 0 && (
-        <div className="question-navigation">
-          <div className="question-counter">
-            Question {currentQuestionIndex + 1} of {questions.length}
-          </div>
-          <div className="question-nav-buttons">
-            <button 
-              className="btn brutal btn-small" 
-              onClick={prevQuestion}
-              disabled={currentQuestionIndex === 0}
-            >
-              ← Previous
-            </button>
-            <button 
-              className="btn brutal btn-small" 
-              onClick={nextQuestion}
-              disabled={currentQuestionIndex === questions.length - 1}
-            >
-              Next →
-            </button>
-          </div>
-        </div>
-      )}
-
-      <div className="question-editor">
+      <div className="questions-container">
         {questions.length === 0 ? (
           <div className="no-questions">
-            <p>No questions yet. Add a question or generate with AI.</p>
-            <button className="btn brutal" onClick={addQuestion}>Add First Question</button>
+            <p>No questions yet. Click "Add New Question" to get started.</p>
           </div>
         ) : (
-          <div className="question-card">
-            <div className="question-header">
-              <label>Question Text</label>
-              <div className="question-actions">
-                <button className="btn brutal btn-small btn-danger" onClick={deleteCurrentQuestion}>Delete</button>
-              </div>
-            </div>
-            <input 
-              value={currentQuestion.text} 
-              onChange={e => updateCurrentQuestion({ ...currentQuestion, text: e.target.value })} 
-              placeholder="Enter your question here..."
-              className="question-input"
+          questions.map((question, index) => (
+            <QuestionEditor
+              key={index}
+              question={question}
+              questionNumber={index + 1}
+              onUpdate={(updatedQuestion) => updateQuestion(index, updatedQuestion)}
+              onDelete={() => deleteQuestion(index)}
             />
-            <div className="options-grid">
-              {currentQuestion.options.map((opt, oi) => (
-                <div key={oi} className="option-row">
-                  <input 
-                    value={opt.text} 
-                    placeholder={`Option ${oi+1}`} 
-                    onChange={e => {
-                      const newOptions = [...currentQuestion.options]
-                      newOptions[oi] = { ...opt, text: e.target.value }
-                      updateCurrentQuestion({ ...currentQuestion, options: newOptions })
-                    }} 
-                    className="option-input"
-                  />
-                  <label className="correct-label">
-                    <input 
-                      type="radio" 
-                      name={`correct-${currentQuestionIndex}`}
-                      checked={opt.correct} 
-                      onChange={() => {
-                        const newOptions = currentQuestion.options.map((o, i) => ({ 
-                          ...o, 
-                          correct: i === oi 
-                        }))
-                        updateCurrentQuestion({ ...currentQuestion, options: newOptions })
-                      }} 
-                    /> 
-                    Correct
-                  </label>
-                </div>
-              ))}
-            </div>
-          </div>
+          ))
         )}
-      </div>
-
-      <div className="question-actions-bottom">
-        <button className="btn brutal" onClick={addQuestion}>Add New Question</button>
       </div>
     </Modal>
     </>
