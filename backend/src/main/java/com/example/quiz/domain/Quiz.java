@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -22,9 +21,13 @@ public class Quiz {
 
     @Enumerated(EnumType.STRING)
     private Difficulty difficulty;
-    
-    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Question> questions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Question> questions;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by")
+    private User createdBy;
 
     public enum Difficulty { EASY, MEDIUM, HARD }
 }

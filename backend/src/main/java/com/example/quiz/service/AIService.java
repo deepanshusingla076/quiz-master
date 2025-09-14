@@ -11,85 +11,7 @@ import java.util.List;
 public class AIService {
     
     public List<Question> generateQuestions(Quiz.Difficulty difficulty, String prompt) {
-        // Use the prompt to generate more varied questions
-        if (prompt != null && !prompt.trim().isEmpty()) {
-            return generatePromptBasedQuestions(difficulty, prompt);
-        }
         return generateMockQuestions(difficulty);
-    }
-    
-    private List<Question> generatePromptBasedQuestions(Quiz.Difficulty difficulty, String prompt) {
-        List<Question> questions = new ArrayList<>();
-        
-        // Generate questions based on the prompt
-        if (prompt.toLowerCase().contains("history")) {
-            questions.add(createMockQuestion(
-                "Which year did World War II end?",
-                List.of("1943", "1945", "1947", "1950"),
-                1
-            ));
-            questions.add(createMockQuestion(
-                "Who was the first President of the United States?",
-                List.of("Thomas Jefferson", "John Adams", "George Washington", "Benjamin Franklin"),
-                2
-            ));
-            questions.add(createMockQuestion(
-                "Which ancient civilization built the pyramids at Giza?",
-                List.of("Romans", "Greeks", "Mayans", "Egyptians"),
-                3
-            ));
-        } else if (prompt.toLowerCase().contains("science")) {
-            questions.add(createMockQuestion(
-                "What is the chemical symbol for water?",
-                List.of("H2O", "CO2", "O2", "NaCl"),
-                0
-            ));
-            questions.add(createMockQuestion(
-                "Which planet is known as the Red Planet?",
-                List.of("Venus", "Jupiter", "Mars", "Saturn"),
-                2
-            ));
-            questions.add(createMockQuestion(
-                "What is the process by which plants make their own food?",
-                List.of("Respiration", "Photosynthesis", "Digestion", "Fermentation"),
-                1
-            ));
-        } else if (prompt.toLowerCase().contains("math")) {
-            questions.add(createMockQuestion(
-                "What is the value of π (pi) to two decimal places?",
-                List.of("3.14", "3.16", "3.12", "3.18"),
-                0
-            ));
-            questions.add(createMockQuestion(
-                "What is the square root of 64?",
-                List.of("6", "7", "8", "9"),
-                2
-            ));
-            questions.add(createMockQuestion(
-                "If x + 5 = 12, what is the value of x?",
-                List.of("5", "6", "7", "8"),
-                2
-            ));
-        } else {
-            // Default to general knowledge questions
-            questions.add(createMockQuestion(
-                "Which country has the largest population in the world?",
-                List.of("India", "United States", "China", "Russia"),
-                2
-            ));
-            questions.add(createMockQuestion(
-                "What is the capital of Japan?",
-                List.of("Seoul", "Beijing", "Tokyo", "Bangkok"),
-                2
-            ));
-            questions.add(createMockQuestion(
-                "Which language has the most native speakers worldwide?",
-                List.of("English", "Spanish", "Hindi", "Mandarin Chinese"),
-                3
-            ));
-        }
-        
-        return questions;
     }
     
     private List<Question> generateMockQuestions(Quiz.Difficulty difficulty) {
@@ -154,7 +76,7 @@ public class AIService {
         
         List<Question.QuestionOption> questionOptions = new ArrayList<>();
         for (int i = 0; i < options.size(); i++) {
-            questionOptions.add(new Question.QuestionOption((long)i, options.get(i), i == correctIndex));
+            questionOptions.add(new Question.QuestionOption(options.get(i), i == correctIndex));
         }
         question.setOptions(questionOptions);
         

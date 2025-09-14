@@ -37,9 +37,6 @@ public class Question {
     @Setter
     @NoArgsConstructor
     public static class QuestionOption {
-        @Column(name = "option_id")
-        private Long id;
-        
         @Column(name = "option_text")
         private String text;
         
@@ -47,12 +44,6 @@ public class Question {
         private boolean correct;
 
         public QuestionOption(String text, boolean correct) {
-            this.text = text;
-            this.correct = correct;
-        }
-        
-        public QuestionOption(Long id, String text, boolean correct) {
-            this.id = id;
             this.text = text;
             this.correct = correct;
         }

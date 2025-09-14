@@ -1,159 +1,164 @@
-# 🎯 QUIZ PLATFORM - Simple & Clean
+# Quiz Master Platform
 
-A modern, easy-to-use quiz platform built with **Spring Boot** and **React**. Perfect for educational institutions and training programs.
+A comprehensive online quiz platform built with Spring Boot and React, featuring real-time quiz capabilities, AI-powered quiz generation, and microservice architecture.
 
 ## 🚀 Quick Start
 
-### Option 1: One-Click Start (Recommended)
-```bash
-# Run this single command to start everything
-.\start-dev.bat
-```
+### Prerequisites
+- Java 21
+- Node.js 18+
+- MySQL 8.0
+- Maven 3.6+
 
-### Option 2: Manual Start
-```bash
-# Terminal 1: Start Registry
-cd registry && mvn spring-boot:run
-
-# Terminal 2: Start Backend  
-cd backend && mvn spring-boot:run
-
-# Terminal 3: Start Frontend
-cd frontend && npm run dev
-```
-
-## 🌐 Access URLs
-- **Frontend**: http://localhost:5173
-- **Backend API**: http://localhost:8080/api
-- **Registry**: http://localhost:8761
-
-## 🔑 Test Credentials
-- **Teacher**: `alice@example.com` / `Passw0rd!`
-- **Student**: `bob@example.com` / `Passw0rd!`
-
-## ✨ Features
-
-### 👨‍🏫 Teacher Dashboard
-- **Create Quizzes**: Easy quiz creation with difficulty levels
-- **Question Management**: Simple one-by-one question editor
-- **AI Generation**: Generate questions automatically (mock data)
-- **Analytics**: View student performance and quiz statistics
-- **Student Management**: Track all student activities
-
-### 👨‍🎓 Student Dashboard
-- **Take Quizzes**: Attempt available quizzes
-- **View Results**: See your scores and performance
-- **Leaderboard**: Check rankings with other students
-
-## 🎨 UI Features
-- **Modern Design**: Clean, professional interface
-- **Responsive**: Works on desktop and mobile
-- **Easy Navigation**: Intuitive question management
-- **Real-time Updates**: Live data without refresh
-
-## 🛠️ Tech Stack
-
-### Backend
-- Spring Boot 3.3.3
-- Spring Security (JWT)
-- Spring Data JPA
-- MySQL Database
-- Maven Build
-
-### Frontend
-- React 18 + TypeScript
-- Vite Build Tool
-- Axios HTTP Client
-- Modern CSS
+### Installation
+1. **Database Setup**: Run `database/schema.sql` in MySQL
+2. **Start Application**: Double-click `set.bat`
+3. **Access**: Frontend at http://localhost:5173, Backend at http://localhost:8080
 
 ## 📁 Project Structure
 ```
 quiz-master/
-├── backend/                 # Spring Boot API
-├── frontend/               # React application
-├── registry/               # Eureka Service Registry
-├── gateway/                # API Gateway
-├── database/               # SQL scripts
-├── set.bat                # Setup script
-└── start-dev.bat          # Development start script
+├── backend/          # Spring Boot Backend
+├── frontend/         # React Frontend  
+├── database/         # Database Schema
+├── docs/             # Documentation
+├── set.bat           # Single startup script
+└── README.md         # This file
 ```
+
+## 📚 Documentation
+- **[Project Overview](docs/PROJECT_OVERVIEW.md)** - Complete project details
+- **[API Documentation](docs/API_DOCUMENTATION.md)** - REST API endpoints
+- **[Database Schema](docs/DATABASE_SCHEMA.md)** - Database structure
+- **[Installation Guide](docs/INSTALLATION_GUIDE.md)** - Detailed setup instructions
 
 ## 🔧 Configuration
+- **Database**: localhost:3306/quiz_db (configurable via environment variables)
+- **Backend Port**: 8080 (configurable via SERVER_PORT)
+- **Frontend Port**: 5173
+- **JWT Secret**: Configured via APP_JWT_SECRET environment variable
+- **Gemini API**: Configured via GEMINI_API_KEY environment variable
 
-### Database Setup
-```bash
-# Create database and tables
-mysql -u root -p < database/schema.sql
-mysql -u root -p < database/seed.sql
-```
+## 📋 Features
+- ✅ User Authentication (JWT)
+- ✅ Role-based Access (Student/Teacher)
+- ✅ Quiz Management
+- ✅ Real-time Quiz Taking
+- ✅ AI Quiz Generation
+- ✅ Question Bank Management
+- ✅ Results & Analytics
+- ✅ Responsive UI
 
-### JWT Secret Key
-The JWT secret is automatically configured for development. For production:
-```bash
-# Set environment variable
-set APP_JWT_SECRET=your-super-secure-key-here
-```
+## 🛠️ Technology Stack
+- **Backend**: Spring Boot, Spring Security, Spring Data JPA, Hibernate
+- **Frontend**: React, TypeScript, Vite, Axios
+- **Database**: MySQL, JDBC
+- **AI**: Google Gemini API
+- **Build**: Maven, npm
 
-## 🎯 Question Management Made Easy
+## Usage
 
-### For Teachers:
-1. **Create Quiz**: Enter title and select difficulty
-2. **Add Questions**: Click "Edit Questions" on any quiz
-3. **Simple Editor**: Navigate through questions one by one
-4. **AI Generation**: Click "Generate with AI" for sample questions
-5. **Save**: All questions are saved automatically
+1. Open your browser and go to `http://localhost:5173`
+2. Sign up for a new account (choose Teacher or Student role)
+3. **For Teachers**:
+   - Create quizzes manually or use AI generation
+   - Manage questions and view analytics
+   - Monitor student performance
+4. **For Students**:
+   - Browse available quizzes
+   - Take quizzes in real-time
+   - View your results and leaderboard
 
-### Key Improvements:
-- ✅ **One-by-one editing**: No more complex forms
-- ✅ **Navigation buttons**: Previous/Next question
-- ✅ **Visual feedback**: Clear question counter
-- ✅ **Easy options**: Simple radio buttons for correct answers
-- ✅ **AI Integration**: Generate questions instantly
-- ✅ **Error handling**: Graceful fallbacks
-
-## 🚨 Troubleshooting
-
-### Common Issues:
-1. **Port conflicts**: Change ports in application.properties
-2. **Database connection**: Ensure MySQL is running
-3. **Frontend not loading**: Run `npm install` in frontend folder
-4. **API errors**: Check backend logs for details
-
-### Quick Fixes:
-```bash
-# Reinstall frontend dependencies
-cd frontend && npm install
-
-# Rebuild backend
-cd backend && mvn clean compile
-
-# Reset database
-mysql -u root -p < database/schema.sql
-```
-
-## 📊 API Endpoints
+## API Endpoints
 
 ### Authentication
-- `POST /api/auth/login` - User login
 - `POST /api/auth/signup` - User registration
-- `GET /api/auth/me` - Get current user
+- `POST /api/auth/login` - User login
+- `POST /api/auth/logout` - User logout
+- `POST /api/auth/refresh` - Refresh JWT token
+- `GET /api/auth/me` - Get current user info
 
-### Quiz Management
-- `GET /api/quiz` - List all quizzes
+### Quizzes
+- `GET /api/quiz` - Get all quizzes (teachers)
+- `GET /api/quiz/available` - Get available quizzes (students)
 - `POST /api/quiz` - Create new quiz
-- `DELETE /api/quiz/{id}` - Delete quiz
 - `GET /api/quiz/{id}/questions` - Get quiz questions
-- `PUT /api/quiz/{id}/questions` - Save quiz questions
+- `PUT /api/quiz/{id}/questions` - Update quiz questions
+- `DELETE /api/quiz/{id}` - Delete quiz
 
-### Quiz Attempts
-- `POST /api/attempt` - Submit quiz attempt
+### Attempts
 - `GET /api/attempt/my` - Get user's attempts
+- `POST /api/attempt` - Submit quiz attempt
 
-## 🎉 Ready to Use!
+### Analytics
+- `GET /api/analytics/summary` - Get quiz summary statistics
+- `GET /api/analytics/students` - Get student performance data
+- `GET /api/analytics/attempts` - Get recent attempts
 
-1. **Start**: Run `.\start-dev.bat`
-2. **Open**: http://localhost:5173
-3. **Login**: Use test credentials
-4. **Create**: Start making quizzes!
+### AI Generation
+- `POST /api/ai/generate` - Generate questions using AI
 
-**Your Quiz Platform is now running perfectly! 🚀**
+## Configuration
+
+### Environment Variables
+
+You can configure the application using environment variables:
+
+- `APP_JWT_SECRET` - JWT secret key (default: provided in application.properties)
+- `APP_JWT_TTL_SECONDS` - JWT token TTL in seconds (default: 86400)
+- `GEMINI_API_KEY` - Gemini AI API key for question generation
+
+### Database Configuration
+
+Configure the application using environment variables or update `backend/src/main/resources/application.properties`:
+
+**Environment Variables:**
+```bash
+# Database Configuration
+DB_URL=jdbc:mysql://localhost:3306/quiz_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+
+# JWT Configuration
+APP_JWT_SECRET=your-super-secret-jwt-key-here
+APP_JWT_TTL_SECONDS=86400
+
+# AI Configuration
+GEMINI_API_KEY=your-gemini-api-key-here
+
+# Server Configuration
+SERVER_PORT=8080
+```
+
+**Or update application.properties directly:**
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/quiz_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+gemini.api.key=your-gemini-api-key-here
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Database Connection Error**: Ensure MySQL is running and credentials are correct
+2. **CORS Issues**: Check that the frontend is running on port 5173
+3. **JWT Token Issues**: Verify the JWT secret key is properly configured
+
+### Logs
+
+- Backend logs: Check console output when running `mvn spring-boot:run`
+- Frontend logs: Check browser console for any JavaScript errors
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License.

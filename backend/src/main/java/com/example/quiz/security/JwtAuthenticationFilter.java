@@ -12,20 +12,23 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private final JwtUtil jwtUtil;
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+    
+    private final JwtTokenValidator tokenValidator;
 
-    public JwtAuthenticationFilter(JwtUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
+    public JwtAuthenticationFilter(JwtTokenValidator tokenValidator) {
+        this.tokenValidator = tokenValidator;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
-        final String username;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
@@ -33,22 +36,36 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         jwt = authHeader.substring(7);
-        try {
-            username = jwtUtil.extractUsername(jwt);
-            String role = jwtUtil.extractRole(jwt);
-
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                if (jwtUtil.validateToken(jwt, username)) {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            username,
-                            null,
-                            List.of(new SimpleGrantedAuthority("ROLE_" + role))
-                    );
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                }
+        
+        // Validate the access token
+        JwtTokenValidator.TokenValidationResult validationResult = tokenValidator.validateAccessToken(jwt);
+        
+        if (!validationResult.isValid()) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            
+            if (validationResult.isExpired()) {
+                response.getWriter().write("{\"error\": \"" + validationResult.getErrorMessage() + "\", \"code\": \"TOKEN_EXPIRED\"}");
+            } else {
+                response.getWriter().write("{\"error\": \"" + validationResult.getErrorMessage() + "\", \"code\": \"INVALID_TOKEN\"}");
             }
-        } catch (Exception e) {
-            // Token is invalid
+            response.getWriter().flush();
+            return;
+        }
+        
+        // Token is valid, set authentication
+        String username = validationResult.getUsername();
+        String role = validationResult.getRole();
+        
+        logger.debug("Processing valid token for user: {}", username);
+
+        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                    username,
+                    null,
+                    List.of(new SimpleGrantedAuthority("ROLE_" + role))
+            );
+            SecurityContextHolder.getContext().setAuthentication(authToken);
         }
 
         filterChain.doFilter(request, response);

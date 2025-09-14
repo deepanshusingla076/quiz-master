@@ -61,6 +61,12 @@ public class QuizController {
         quizService.saveQuestions(id, questions);
         return questions;
     }
+    
+    @PostMapping("/{id}/questions/batch")
+    public ResponseEntity<?> addQuestionsBatch(@PathVariable Long id, @RequestBody List<Question> questions) {
+        quizService.saveQuestions(id, questions);
+        return ResponseEntity.ok().build();
+    }
 }
 
 

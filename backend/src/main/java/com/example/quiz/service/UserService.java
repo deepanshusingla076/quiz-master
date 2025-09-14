@@ -19,6 +19,11 @@ public class UserService {
     }
 
     public User signup(String name, String email, String rawPassword, Role role) {
+        // Check if user already exists
+        if (userRepository.findByEmail(email.toLowerCase()).isPresent()) {
+            throw new RuntimeException("User with email " + email + " already exists");
+        }
+        
         User u = new User();
         u.setName(name);
         u.setEmail(email.toLowerCase());

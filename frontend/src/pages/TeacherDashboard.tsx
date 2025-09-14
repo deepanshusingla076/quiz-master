@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import Modal from '../components/Modal'
+import AIQuizGenerator from '../components/AIQuizGenerator'
+import AnalyticsDashboard from '../components/AnalyticsDashboard'
 
 type Quiz = { id: number; title: string; difficulty: 'EASY'|'MEDIUM'|'HARD' }
 type Question = { id?: number; text: string; options: { text: string; correct: boolean }[] }
@@ -17,6 +19,7 @@ export default function TeacherDashboard() {
   const [questions, setQuestions] = useState<Question[]>([])
   const [aiBusy, setAiBusy] = useState(false)
   const [aiPrompt, setAiPrompt] = useState('')
+  const [showAIGenerator, setShowAIGenerator] = useState(false)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
 
   async function load() {
@@ -45,6 +48,32 @@ export default function TeacherDashboard() {
       load()
     } catch (error) {
       console.error('Error creating quiz:', error)
+    }
+  }
+  
+  const handleQuizGenerated = async (questionBank: any) => {
+    try {
+      // First create a new quiz
+      const quizResponse = await axios.post('/api/quiz', { 
+        title: `AI Generated: ${questionBank.subject}`, 
+        difficulty: questionBank.difficulty 
+      })
+      
+      const quizId = quizResponse.data.id
+      
+      // Then add all the generated questions to the quiz
+      const questionsToAdd = questionBank.questions.map((q: any) => ({
+        text: q.text,
+        options: q.options
+      }))
+      
+      await axios.post(`/api/quiz/${quizId}/questions/batch`, questionsToAdd)
+      
+      // Refresh the quiz list
+      load()
+      setShowAIGenerator(false)
+    } catch (error) {
+      console.error('Error saving AI generated quiz:', error)
     }
   }
 
@@ -183,7 +212,21 @@ export default function TeacherDashboard() {
           </select>
         </div>
         <button className="btn brutal" type="submit">Create Quiz</button>
+        <button 
+          type="button" 
+          className="btn brutal" 
+          onClick={() => setShowAIGenerator(!showAIGenerator)}
+          style={{marginLeft: '10px'}}
+        >
+          {showAIGenerator ? 'Hide AI Generator' : 'Use AI Generator'}
+        </button>
       </form>
+      
+      {showAIGenerator && (
+        <div className="ai-generator-container" style={{marginTop: '20px'}}>
+          <AIQuizGenerator onQuizGenerated={handleQuizGenerated} />
+        </div>
+      )}
 
       <div className="card brutal">
         <h3 style={{marginTop:0}}>Manage Quizzes</h3>
@@ -203,59 +246,13 @@ export default function TeacherDashboard() {
         </div>
       </div>
 
-      <div className="card brutal" style={{gridColumn:'1 / -1'}}>
-        <h3 style={{marginTop:0}}>Students</h3>
-        <div className="grid" style={{gridTemplateColumns:'1fr 1fr 1fr 1fr'}}>
-          <div><b>Name</b></div><div><b>Attempts</b></div><div><b>Avg Score</b></div><div><b>Id</b></div>
-          {students.map((s, index) => (
-            <React.Fragment key={index}>
-              <div>{s.name}</div>
-              <div>{s.attempts}</div>
-              <div>{Math.round(s.avgScore)}</div>
-              <div>{s.studentId}</div>
-            </React.Fragment>
-          ))}
-        </div>
-      </div>
-
-      <div className="card brutal" style={{gridColumn:'1 / -1'}}>
-        <h3 style={{marginTop:0}}>Analytics</h3>
-        {summary && (
-          <div style={{display:'flex', gap:24}}>
-            <div><b>Attempts</b><div>{summary.attemptCount}</div></div>
-            <div><b>Avg</b><div>{Math.round(summary.avgScore)}</div></div>
-            <div><b>Best</b><div>{summary.maxScore}</div></div>
-            <div><b>Worst</b><div>{summary.minScore}</div></div>
-          </div>
-        )}
-        <h4>Recent Attempts</h4>
-        <div className="grid" style={{gridTemplateColumns:'1fr 1fr 1fr 1fr'}}>
-          <div><b>Student</b></div><div><b>Quiz</b></div><div><b>Score</b></div><div><b>Time</b></div>
-          {attempts.map((a, index) => (
-            <React.Fragment key={index}>
-              <div>{a.studentName}</div>
-              <div>{a.quizTitle}</div>
-              <div>{a.score}</div>
-              <div>{new Date(a.createdAt).toLocaleString()}</div>
-            </React.Fragment>
-          ))}
-        </div>
+      <div style={{gridColumn:'1 / -1'}}>
+        <AnalyticsDashboard />
       </div>
     </div>
 
     <Modal open={questionModalOpen} title="Edit Questions" onClose={()=>setQuestionModalOpen(false)}>
       <div className="question-controls">
-        <div className="ai-controls">
-          <input 
-            value={aiPrompt} 
-            onChange={e=>setAiPrompt(e.target.value)} 
-            placeholder="Enter AI prompt for question generation..."
-            className="ai-prompt-input"
-          />
-          <button disabled={aiBusy} className="btn brutal" onClick={generateWithAI}>
-            {aiBusy ? 'Generating…' : 'Generate with AI'}
-          </button>
-        </div>
         <div className="save-controls">
           <button className="btn brutal btn-primary" onClick={saveQuestions}>Save All Questions</button>
         </div>

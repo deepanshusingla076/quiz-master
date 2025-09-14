@@ -16,25 +16,11 @@ function Shell() {
   const { user, loading, logout } = useAuth()
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [theme, setTheme] = useState(() => {
-    const savedTheme = localStorage.getItem('theme')
-    return savedTheme || 'light'
-  })
   
   useEffect(() => {
     // redirect post-login
     if (user) navigate(user.role === 'TEACHER' ? '/teacher' : '/student')
   }, [user])
-  
-  useEffect(() => {
-    // Apply theme to document body
-    document.body.setAttribute('data-theme', theme)
-    localStorage.setItem('theme', theme)
-  }, [theme])
-  
-  const toggleTheme = () => {
-    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light')
-  }
   
   if (loading) {
     return (
@@ -57,13 +43,6 @@ function Shell() {
             style={{marginRight: '16px'}}
           >
             ☰
-          </button>
-          <button 
-            className="btn brutal theme-toggle" 
-            onClick={toggleTheme}
-            style={{marginRight: '16px'}}
-          >
-            {theme === 'light' ? '🌙' : '☀️'}
           </button>
           <h1 style={{fontFamily:'Impact, Haettenschweiler, Arial Black', letterSpacing:1}}>QUIZ//PLATFORM</h1>
         </div>

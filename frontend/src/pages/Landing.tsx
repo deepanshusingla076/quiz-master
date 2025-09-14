@@ -26,12 +26,14 @@ export default function Landing() {
     <div>
       <section className="hero">
         <div className="card brutal">
-          <h2 style={{marginTop:0}}>We make quizzes feel like a showdown.</h2>
-          <p>Brutal visuals. Clean flows. Built for speed.</p>
+          <h2 style={{marginTop:0}}>Quiz Master: Interactive Learning Platform</h2>
+          <p>Modern, real-time quiz platform with microservices architecture</p>
           <ul>
-            <li>Role-based dashboards</li>
-            <li>Real-time leaderboard</li>
-            <li>Responsive by default</li>
+            <li>Role-based dashboards for teachers and students</li>
+            <li>Real-time quiz participation</li>
+            <li>Comprehensive question bank management</li>
+            <li>Detailed analytics and performance tracking</li>
+            <li>Responsive design for all devices</li>
           </ul>
         </div>
         <form className="card brutal" onSubmit={onSubmit}>
