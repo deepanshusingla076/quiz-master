@@ -1,99 +1,55 @@
-# 🎯 QUIZ PLATFORM - Full Stack Educational Platform
+# 🎯 QUIZ PLATFORM - Simple & Clean
 
-A complete educational platform built with **Spring Boot** backend and **React** frontend, featuring JWT authentication, real-time updates, and role-based dashboards.
+A modern, easy-to-use quiz platform built with **Spring Boot** and **React**. Perfect for educational institutions and training programs.
 
-## 🚀 Quick Start (One Command)
+## 🚀 Quick Start
 
-### Windows PowerShell:
-```powershell
-# Terminal 1: Start Backend
-cd backend
-mvn spring-boot:run
-
-# Terminal 2: Start Frontend  
-cd frontend
-npm run dev
+### Option 1: One-Click Start (Recommended)
+```bash
+# Run this single command to start everything
+.\start-dev.bat
 ```
 
-### Linux/Mac:
+### Option 2: Manual Start
 ```bash
-# Terminal 1: Start Backend
+# Terminal 1: Start Registry
+cd registry && mvn spring-boot:run
+
+# Terminal 2: Start Backend  
 cd backend && mvn spring-boot:run
 
-# Terminal 2: Start Frontend
+# Terminal 3: Start Frontend
 cd frontend && npm run dev
 ```
 
 ## 🌐 Access URLs
 - **Frontend**: http://localhost:5173
-- **Gateway**: http://localhost:8080 (planned)
-- **Backend API (current)**: http://localhost:8081
-- **Database**: MySQL `quiz_db`
+- **Backend API**: http://localhost:8080/api
+- **Registry**: http://localhost:8761
 
-## 🗄️ Database Setup
-```bash
-# Create database and tables
-mysql -u root -p < database/schema.sql
-mysql -u root -p < database/seed.sql
-```
-
-**Database Name**: `quiz_db`
-
-## 🔐 Test Credentials
+## 🔑 Test Credentials
 - **Teacher**: `alice@example.com` / `Passw0rd!`
 - **Student**: `bob@example.com` / `Passw0rd!`
 
-## 🧪 Test JWT API
-```bash
-# Login to get JWT token
-curl -X POST http://localhost:8080/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"alice@example.com","password":"Passw0rd!"}'
-
-# Use token in Authorization header
-curl -X GET http://localhost:8080/api/quiz \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN"
-```
-
-## 🏗️ Architecture
-
-### Backend (Spring Boot)
-- **Port**: 8080
-- **Database**: MySQL with JPA
-- **Security**: JWT Authentication
-- **Real-time**: WebSocket (STOMP)
-- **API**: RESTful endpoints
-
-### Frontend (React + Vite)
-- **Port**: 5173
-- **Theme**: Brutalist design
-- **State**: Context API
-- **HTTP**: Axios with JWT
-- **Real-time**: WebSocket client
-
-## 📋 Features
-
-### 🔐 Authentication
-- JWT-based login/signup
-- Role-based access (TEACHER/STUDENT)
-- Secure password hashing (BCrypt)
+## ✨ Features
 
 ### 👨‍🏫 Teacher Dashboard
-- Create/manage quizzes (Easy/Medium/Hard)
-- View student list and performance
-- Analytics and quiz statistics
-- Real-time student activity
+- **Create Quizzes**: Easy quiz creation with difficulty levels
+- **Question Management**: Simple one-by-one question editor
+- **AI Generation**: Generate questions automatically (mock data)
+- **Analytics**: View student performance and quiz statistics
+- **Student Management**: Track all student activities
 
-### 👨‍🎓 Student Dashboard  
-- Attempt available quizzes
-- View past results and scores
-- Live leaderboard updates
-- Performance tracking
+### 👨‍🎓 Student Dashboard
+- **Take Quizzes**: Attempt available quizzes
+- **View Results**: See your scores and performance
+- **Leaderboard**: Check rankings with other students
 
-### ⚡ Real-time Features
-- Live leaderboard updates
-- WebSocket notifications
-- Real-time quiz status
+## 🎨 UI Features
+- **Modern Design**: Clean, professional interface
+- **Responsive**: Works on desktop and mobile
+- **Easy Navigation**: Intuitive question management
+- **Real-time Updates**: Live data without refresh
 
 ## 🛠️ Tech Stack
 
@@ -102,128 +58,102 @@ curl -X GET http://localhost:8080/api/quiz \
 - Spring Security (JWT)
 - Spring Data JPA
 - MySQL Database
-- WebSocket (STOMP)
 - Maven Build
 
 ### Frontend
 - React 18 + TypeScript
 - Vite Build Tool
 - Axios HTTP Client
-- STOMP WebSocket Client
-- Brutalist CSS Theme
+- Modern CSS
 
 ## 📁 Project Structure
 ```
-quiz/
+quiz-master/
 ├── backend/                 # Spring Boot API
-│   ├── src/main/java/      # Java source code
-│   ├── src/main/resources/ # Config files
-│   └── pom.xml            # Maven dependencies
 ├── frontend/               # React application
-│   ├── src/               # React source code
-│   ├── package.json       # npm dependencies
-│   └── vite.config.ts     # Vite configuration
-├── database/              # SQL scripts
-│   ├── schema.sql         # Database schema
-│   └── seed.sql          # Sample data
-└── README.md             # This file
+├── registry/               # Eureka Service Registry
+├── gateway/                # API Gateway
+├── database/               # SQL scripts
+├── set.bat                # Setup script
+└── start-dev.bat          # Development start script
 ```
 
 ## 🔧 Configuration
 
-### Backend Configuration (`application.properties`)
-```properties
-# Database
-spring.datasource.url=jdbc:mysql://localhost:3306/quiz_db
-spring.datasource.username=root
-spring.datasource.password=your_password
-
-# JWT
-app.jwt.secret=my-super-secret-jwt-key-for-quiz-platform-2024-secure-key
-app.jwt.ttlSeconds=86400
-
-# Server
-server.port=8080
+### Database Setup
+```bash
+# Create database and tables
+mysql -u root -p < database/schema.sql
+mysql -u root -p < database/seed.sql
 ```
 
-### Frontend Configuration (`vite.config.ts`)
-```typescript
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    port: 5173,
-    proxy: {
-      '/api': 'http://localhost:8080'
-    }
-  }
-})
+### JWT Secret Key
+The JWT secret is automatically configured for development. For production:
+```bash
+# Set environment variable
+set APP_JWT_SECRET=your-super-secure-key-here
 ```
+
+## 🎯 Question Management Made Easy
+
+### For Teachers:
+1. **Create Quiz**: Enter title and select difficulty
+2. **Add Questions**: Click "Edit Questions" on any quiz
+3. **Simple Editor**: Navigate through questions one by one
+4. **AI Generation**: Click "Generate with AI" for sample questions
+5. **Save**: All questions are saved automatically
+
+### Key Improvements:
+- ✅ **One-by-one editing**: No more complex forms
+- ✅ **Navigation buttons**: Previous/Next question
+- ✅ **Visual feedback**: Clear question counter
+- ✅ **Easy options**: Simple radio buttons for correct answers
+- ✅ **AI Integration**: Generate questions instantly
+- ✅ **Error handling**: Graceful fallbacks
 
 ## 🚨 Troubleshooting
 
-### Backend Issues
-- **JWT Errors**: Check `app.jwt.secret` in `application.properties`
-- **Database Connection**: Verify MySQL is running and credentials are correct
-- **Port Conflicts**: Change `server.port` if 8080 is occupied
+### Common Issues:
+1. **Port conflicts**: Change ports in application.properties
+2. **Database connection**: Ensure MySQL is running
+3. **Frontend not loading**: Run `npm install` in frontend folder
+4. **API errors**: Check backend logs for details
 
-### Frontend Issues  
-- **API Connection**: Ensure backend is running on port 8080
-- **Build Errors**: Run `npm install` to install dependencies
-- **Port Conflicts**: Change port in `vite.config.ts` if 5173 is occupied
+### Quick Fixes:
+```bash
+# Reinstall frontend dependencies
+cd frontend && npm install
 
-### Database Issues
-- **Connection Failed**: Check MySQL service is running
-- **Table Errors**: Re-run `schema.sql` and `seed.sql`
-- **Permission Denied**: Verify MySQL user permissions
+# Rebuild backend
+cd backend && mvn clean compile
+
+# Reset database
+mysql -u root -p < database/schema.sql
+```
 
 ## 📊 API Endpoints
 
 ### Authentication
 - `POST /api/auth/login` - User login
-- `POST /api/auth/signup` - User registration  
-- `POST /api/auth/logout` - User logout
+- `POST /api/auth/signup` - User registration
 - `GET /api/auth/me` - Get current user
 
 ### Quiz Management
 - `GET /api/quiz` - List all quizzes
 - `POST /api/quiz` - Create new quiz
 - `DELETE /api/quiz/{id}` - Delete quiz
+- `GET /api/quiz/{id}/questions` - Get quiz questions
+- `PUT /api/quiz/{id}/questions` - Save quiz questions
 
 ### Quiz Attempts
 - `POST /api/attempt` - Submit quiz attempt
 - `GET /api/attempt/my` - Get user's attempts
 
-### Analytics
-- `GET /api/analytics/summary` - Quiz statistics
-- `GET /api/analytics/students` - Student performance
-- `GET /api/analytics/attempts` - All attempts
+## 🎉 Ready to Use!
 
-## 🎨 UI Features
-- **Brutalist Design**: Bold typography, high contrast
-- **Responsive Layout**: Works on desktop and mobile
-- **Dark Theme**: Professional appearance
-- **Real-time Updates**: Live data without refresh
+1. **Start**: Run `.\start-dev.bat`
+2. **Open**: http://localhost:5173
+3. **Login**: Use test credentials
+4. **Create**: Start making quizzes!
 
-## 🔒 Security Features
-- JWT token authentication
-- Password hashing with BCrypt
-- Role-based authorization
-- CORS configuration
-- Input validation
-
-## 📈 Performance
-- Optimized database queries
-- Efficient state management
-- Real-time WebSocket updates
-- Responsive UI components
-
----
-
-## 🎯 **READY TO USE!**
-
-1. **Start Backend**: `cd backend && mvn spring-boot:run`
-2. **Start Frontend**: `cd frontend && npm run dev`  
-3. **Open Browser**: http://localhost:5173
-4. **Login**: Use `alice@example.com` / `Passw0rd!`
-
-**Your Quiz Platform is now running! 🚀**
+**Your Quiz Platform is now running perfectly! 🚀**

@@ -20,6 +20,24 @@ CREATE TABLE quiz (
   difficulty VARCHAR(16) NOT NULL
 ) ENGINE=InnoDB;
 
+-- Questions table
+CREATE TABLE question (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  text VARCHAR(500) NOT NULL,
+  quiz_id BIGINT NOT NULL,
+  CONSTRAINT fk_question_quiz FOREIGN KEY (quiz_id) REFERENCES quiz(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- Question options table
+CREATE TABLE question_options (
+  question_id BIGINT NOT NULL,
+  option_id BIGINT NOT NULL,
+  option_text VARCHAR(255) NOT NULL,
+  is_correct BOOLEAN NOT NULL DEFAULT FALSE,
+  CONSTRAINT fk_option_question FOREIGN KEY (question_id) REFERENCES question(id) ON DELETE CASCADE,
+  UNIQUE KEY unique_option_id_per_question (question_id, option_id)
+) ENGINE=InnoDB;
+
 -- Attempts table
 CREATE TABLE attempt (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
