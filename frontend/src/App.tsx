@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Routes, Route, Navigate, Link, useNavigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './auth/AuthContext'
+import { ThemeProvider } from './contexts/ThemeContext'
+import ThemeToggle from './components/ThemeToggle'
 import Landing from './pages/Landing'
 import TeacherDashboard from './pages/TeacherDashboard'
 import StudentDashboard from './pages/StudentDashboard'
@@ -47,6 +49,7 @@ function Shell() {
           <h1 style={{fontFamily:'Impact, Haettenschweiler, Arial Black', letterSpacing:1}}>QUIZ//PLATFORM</h1>
         </div>
         <div className="header-right">
+          <ThemeToggle />
           {user ? (
             <div className="user-info">
               <span className="user-role">{user.role}</span>
@@ -54,13 +57,13 @@ function Shell() {
             </div>
           ) : (
             <div className="auth-toggle">
-              <button 
+              {/* <button 
                 className="btn brutal" 
                 onClick={() => navigate('/')}
                 style={{textDecoration:'none'}}
               >
                 🔐 Auth
-              </button>
+              </button> */}
             </div>
           )}
         </div>
@@ -102,9 +105,11 @@ function Shell() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <Shell />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <Shell />
+      </AuthProvider>
+    </ThemeProvider>
   )
 }
 

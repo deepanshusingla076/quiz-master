@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '../auth/AuthContext'
+import ThemeToggle from '../components/ThemeToggle'
 
 export default function Landing() {
   const { login, signup } = useAuth()
@@ -70,7 +71,7 @@ export default function Landing() {
       </section>
 
       <section className="card brutal" style={{marginTop:24}}>
-        <h3 style={{marginTop:0}}>About QUIZ//PLATFORM</h3>
+        <h2 style={{marginTop:0}}>About QUIZ//PLATFORM</h2>
         <p>QUIZ//PLATFORM is a cutting-edge quiz management system designed for educational institutions, corporate training, and competitive learning environments. Our platform combines modern technology with intuitive design to create an engaging and efficient quiz experience.</p>
         
         <h4>Key Features:</h4>
@@ -95,7 +96,7 @@ export default function Landing() {
       </section>
 
       <section className="card brutal" style={{marginTop:24}}>
-        <h3 style={{marginTop:0}}>Contact & Support</h3>
+        <h2 style={{marginTop:0}}>Contact & Support</h2>
         <p>We're here to help you get the most out of QUIZ//PLATFORM. Reach out to us for support, feature requests, or general inquiries.</p>
         
         <div className="contact-grid">
@@ -105,11 +106,11 @@ export default function Landing() {
             <a href="mailto:support@quizplatform.com" className="contact-link">support@quizplatform.com</a>
           </div>
           
-          <div className="contact-item">
+          {/* <div className="contact-item">
             <h4>💼 Business Inquiries</h4>
             <p>Partnership opportunities and enterprise solutions</p>
             <a href="mailto:business@quizplatform.com" className="contact-link">business@quizplatform.com</a>
-          </div>
+          </div> */}
           
           <div className="contact-item">
             <h4>🚀 Feature Requests</h4>
@@ -120,7 +121,7 @@ export default function Landing() {
           <div className="contact-item">
             <h4>📞 Phone Support</h4>
             <p>Monday - Friday, 9 AM - 6 PM EST</p>
-            <a href="tel:+1-555-QUIZ-HELP" className="contact-link">+1 (555) QUIZ-HELP</a>
+            <a href="tel:8923709367" className="contact-link">+91 89237 09367</a>
           </div>
         </div>
         
