@@ -1,0 +1,11 @@
+com\example\quiz\auth\repository\UserRepository.class
+com\example\quiz\auth\service\JwtService.class
+com\example\quiz\auth\controller\AuthController.class
+com\example\quiz\auth\domain\User.class
+com\example\quiz\auth\dto\SignupRequest.class
+com\example\quiz\auth\config\SecurityConfig.class
+com\example\quiz\auth\domain\Role.class
+com\example\quiz\auth\dto\AuthResponse.class
+com\example\quiz\auth\AuthServiceApplication.class
+com\example\quiz\auth\dto\LoginRequest.class
+com\example\quiz\auth\service\AuthService.class

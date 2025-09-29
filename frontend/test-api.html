@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Platform API Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        .success { color: green; }
+        .error { color: red; }
+        .result { margin: 10px 0; padding: 10px; background: #f5f5f5; }
+        button { margin: 5px; padding: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Quiz Platform API Test Suite</h1>
+    
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Manual Tests</h2>
+        <button onclick="testQuizEndpoints()">Test Quiz Endpoints</button>
+        <button onclick="testAIEndpoint()">Test AI Generation</button>
+        <button onclick="testAnalyticsEndpoints()">Test Analytics</button>
+        <button onclick="testCORSHeaders()">Test CORS</button>
+        <button onclick="clearResults()">Clear Results</button>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080';
+        const resultsDiv = document.getElementById('results');
+
+        function log(message, isError = false) {
+            const div = document.createElement('div');
+            div.className = `result ${isError ? 'error' : 'success'}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong>: ${message}`;
+            resultsDiv.appendChild(div);
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
+        }
+
+        function clearResults() {
+            resultsDiv.innerHTML = '';
+        }
+
+        async function testQuizEndpoints() {
+            log('🧪 Testing Quiz Endpoints...');
+            
+            // First, try to get auth token
+            const authToken = await getAuthToken();
+            if (!authToken) {
+                log('❌ Cannot test quiz endpoints without authentication', true);
+                return;
+            }
+
+            const headers = {
+                'Authorization': `Bearer ${authToken}`,
+                'X-User-Id': '1',
+                'X-User-Role': 'TEACHER',
+                'Content-Type': 'application/json'
+            };
+
+            try {
+                // Test GET teacher quizzes
+                const response = await axios.get(`${API_BASE}/api/questionbank/quizzes/teacher`, { headers });
+                log(`✅ GET teacher quizzes: ${response.status} - Got ${response.data?.length || 0} quizzes`);
+            } catch (error) {
+                log(`❌ GET teacher quizzes failed: ${error.response?.status} ${error.response?.statusText || error.message}`, true);
+            }
+
+            try {
+                // Test POST create quiz
+                const quizData = {
+                    title: "Test Quiz API",
+                    description: "Testing quiz creation",
+                    difficulty: "EASY",
+                    questions: [
+                        {
+                            text: "What is 2+2?",
+                            options: [
+                                { text: "3", isCorrect: false },
+                                { text: "4", isCorrect: true },
+                                { text: "5", isCorrect: false }
+                            ]
+                        }
+                    ]
+                };
+                
+                const createResponse = await axios.post(
+                    `${API_BASE}/api/questionbank/quizzes`, 
+                    quizData, 
+                    { headers }
+                );
+                log(`✅ POST create quiz: ${createResponse.status} - Quiz created with ID ${createResponse.data?.id}`);
+            } catch (error) {
+                log(`❌ POST create quiz failed: ${error.response?.status} ${error.response?.statusText || error.message}`, true);
+            }
+        }
+
+        async function getAuthToken() {
+            try {
+                // Try to create a test user and get token
+                const signupData = {
+                    name: "Test Teacher API",
+                    email: "testapi@teacher.com",
+                    password: "password123",
+                    role: "TEACHER"
+                };
+                
+                let authResponse;
+                try {
+                    authResponse = await axios.post(`${API_BASE}/api/auth/signup`, signupData);
+                    log(`✅ Created test user: ${authResponse.status}`);
+                } catch (signupError) {
+                    // If signup fails (user exists), try to login
+                    const loginData = {
+                        email: "testapi@teacher.com",
+                        password: "password123"
+                    };
+                    authResponse = await axios.post(`${API_BASE}/api/auth/login`, loginData);
+                    log(`✅ Logged in test user: ${authResponse.status}`);
+                }
+                
+                return authResponse.data.token;
+            } catch (error) {
+                log(`❌ Authentication failed: ${error.response?.status} ${error.response?.data?.message || error.message}`, true);
+                return null;
+            }
+        }
+
+        async function testAIEndpoint() {
+            log('🤖 Testing AI Generation Endpoint...');
+            
+            const authToken = await getAuthToken();
+            if (!authToken) {
+                log('❌ Cannot test AI endpoint without authentication', true);
+                return;
+            }
+
+            const headers = {
+                'Authorization': `Bearer ${authToken}`,
+                'X-User-Id': '1',
+                'X-User-Role': 'TEACHER',
+                'Content-Type': 'application/json'
+            };
+
+            try {
+                const aiData = {
+                    subject: "Mathematics",
+                    difficulty: "EASY",
+                    numberOfQuestions: 3
+                };
+                
+                const response = await axios.post(
+                    `${API_BASE}/api/ai/generate`, 
+                    aiData, 
+                    { headers }
+                );
+                log(`✅ AI Generation: ${response.status} - Generated quiz with ${response.data?.questions?.length || 0} questions`);
+            } catch (error) {
+                log(`❌ AI Generation failed: ${error.response?.status} ${error.response?.statusText || error.message}`, true);
+            }
+        }
+
+        async function testAnalyticsEndpoints() {
+            log('📊 Testing Analytics Endpoints...');
+            
+            const headers = {
+                'X-User-Id': '1',
+                'X-User-Role': 'TEACHER'
+            };
+
+            try {
+                const response = await axios.get(`${API_BASE}/api/analytics/attempts`, { headers });
+                log(`✅ Analytics attempts: ${response.status} - Got ${response.data?.length || 0} attempts`);
+            } catch (error) {
+                log(`❌ Analytics attempts failed: ${error.response?.status} ${error.response?.statusText || error.message}`, true);
+            }
+
+            try {
+                const response = await axios.get(`${API_BASE}/api/analytics/summary`, { headers });
+                log(`✅ Analytics summary: ${response.status} - Got summary data`);
+            } catch (error) {
+                log(`❌ Analytics summary failed: ${error.response?.status} ${error.response?.statusText || error.message}`, true);
+            }
+        }
+
+        async function testCORSHeaders() {
+            log('🌐 Testing CORS Configuration...');
+            
+            try {
+                const response = await axios.options(`${API_BASE}/api/questionbank/quizzes/teacher`);
+                log(`✅ CORS preflight: ${response.status} - CORS headers configured`);
+            } catch (error) {
+                log(`❌ CORS preflight failed: ${error.response?.status} ${error.response?.statusText || error.message}`, true);
+            }
+        }
+
+        // Auto-run tests on page load
+        window.onload = function() {
+            log('🚀 Starting automated API tests...');
+            setTimeout(() => testCORSHeaders(), 500);
+            setTimeout(() => testQuizEndpoints(), 1000);
+            setTimeout(() => testAnalyticsEndpoints(), 2000);
+            setTimeout(() => testAIEndpoint(), 3000);
+        };
+    </script>
+</body>
+</html>

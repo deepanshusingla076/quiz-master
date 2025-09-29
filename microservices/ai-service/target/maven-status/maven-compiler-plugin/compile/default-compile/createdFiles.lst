@@ -1,0 +1,6 @@
+com\example\quiz\ai\config\AIConfig.class
+com\example\quiz\ai\controller\AIController$GenerateRequest.class
+com\example\quiz\ai\config\SecurityConfig.class
+com\example\quiz\ai\service\AIQuizGeneratorService.class
+com\example\quiz\ai\AiServiceApplication.class
+com\example\quiz\ai\controller\AIController.class

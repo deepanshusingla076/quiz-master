@@ -1,0 +1,3 @@
+com\example\quiz\gateway\filter\JwtAuthenticationFilter.class
+com\example\quiz\gateway\filter\JwtAuthenticationFilter$Config.class
+com\example\quiz\gateway\ApiGatewayApplication.class

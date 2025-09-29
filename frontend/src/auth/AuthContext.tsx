@@ -1,20 +1,30 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import axios from 'axios'
+import { User, Role, AuthResponse } from '../types'
+import { API_CONFIG, DEFAULT_HEADERS } from '../config/api'
 
-type Role = 'TEACHER' | 'STUDENT'
-type User = { id: number; name: string; role: Role }
-type AuthResponse = { token: string; refreshToken: string; user: User }
+type SignupRequest = {
+  name: string;
+  email: string;
+  password: string;
+  role: Role;
+  groupSection?: string;
+}
 
 type AuthContextType = {
   user: User | null
   loading: boolean
   login: (email: string, password: string) => Promise<void>
-  signup: (name: string, email: string, password: string, role: Role) => Promise<void>
+  signup: (data: SignupRequest) => Promise<void>
   logout: () => Promise<void>
-  refreshToken: () => Promise<boolean>
 }
 
 const AuthContext = createContext<AuthContextType>({} as any)
+
+// Set base URL for API Gateway
+axios.defaults.baseURL = API_CONFIG.BASE_URL
+axios.defaults.timeout = API_CONFIG.TIMEOUT
+axios.defaults.headers.common = { ...DEFAULT_HEADERS }
 
 // Configure axios to include JWT token in requests
 axios.interceptors.request.use((config) => {
@@ -29,46 +39,13 @@ axios.interceptors.request.use((config) => {
 axios.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config;
-    
-    // If error is 401 and we haven't tried to refresh the token yet
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      
-      try {
-        // Try to refresh the token
-        const refreshToken = localStorage.getItem('refreshToken');
-        if (!refreshToken) {
-          // No refresh token available, redirect to login
-          localStorage.removeItem('token');
-          localStorage.removeItem('refreshToken');
-          window.location.href = '/login';
-          return Promise.reject(error);
-        }
-        
-        // Call refresh token endpoint
-        const response = await axios.post('/api/auth/refresh', { token: refreshToken });
-        const { token, refreshToken: newRefreshToken } = response.data;
-        
-        // Update tokens in localStorage
-        localStorage.setItem('token', token);
-        localStorage.setItem('refreshToken', newRefreshToken);
-        
-        // Update the Authorization header for the original request
-        originalRequest.headers.Authorization = `Bearer ${token}`;
-        
-        // Retry the original request
-        return axios(originalRequest);
-      } catch (refreshError) {
-        // Refresh token failed, redirect to login
-        localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
-        window.location.href = '/login';
-        return Promise.reject(refreshError);
-      }
+    if (error.response?.status === 401) {
+      // Token expired or invalid, redirect to login
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      window.location.href = '/'
     }
-    
-    return Promise.reject(error);
+    return Promise.reject(error)
   }
 )
 
@@ -79,83 +56,72 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem('token')
-      if (token) {
+      const userData = localStorage.getItem('user')
+      
+      if (token && userData) {
         try {
-          const response = await axios.get('/api/auth/me')
-          setUser(response.data)
-        } catch (err: any) {
-          console.log('Auth check failed:', err)
-          // Only clear auth on 401/403, keep tokens for network errors
-          if (err?.response?.status === 401 || err?.response?.status === 403) {
-            localStorage.removeItem('token')
-            localStorage.removeItem('refreshToken')
-            setUser(null)
-          }
-        } finally {
-          setLoading(false)
+          // Validate token with backend using proper endpoint
+          const response = await axios.get(API_CONFIG.ENDPOINTS.AUTH.PROFILE)
+          // Update user data from backend response if needed
+          setUser(JSON.parse(userData))
+        } catch (err) {
+          console.log('Token validation failed:', err)
+          localStorage.removeItem('token')
+          localStorage.removeItem('user')
+          setUser(null)
         }
-      } else {
-        setLoading(false)
       }
+      setLoading(false)
     }
     
     checkAuth()
   }, [])
 
   async function login(email: string, password: string) {
-    const response = await axios.post('/api/auth/login', { email, password })
-    const { token, refreshToken, user: userData } = response.data
-    localStorage.setItem('token', token)
-    localStorage.setItem('refreshToken', refreshToken)
-    setUser(userData)
+    const response = await axios.post(API_CONFIG.ENDPOINTS.AUTH.LOGIN, { email, password })
+    const authData = response.data
+    
+    const user: User = {
+      id: authData.userId,
+      name: authData.name,
+      email: authData.email,
+      role: authData.role,
+      groupSection: authData.groupSection || ''
+    }
+    
+    localStorage.setItem('token', authData.token)
+    localStorage.setItem('user', JSON.stringify(user))
+    setUser(user)
   }
   
-  async function signup(name: string, email: string, password: string, role: Role) {
-    const response = await axios.post('/api/auth/signup', { name, email, password, role })
-    const { token, refreshToken, user: userData } = response.data
-    localStorage.setItem('token', token)
-    localStorage.setItem('refreshToken', refreshToken)
-    setUser(userData)
+  async function signup(data: SignupRequest) {
+    const response = await axios.post(API_CONFIG.ENDPOINTS.AUTH.SIGNUP, data)
+    const authData = response.data
+    
+    const user: User = {
+      id: authData.userId,
+      name: authData.name,
+      email: authData.email,
+      role: authData.role,
+      groupSection: authData.groupSection || ''
+    }
+    
+    localStorage.setItem('token', authData.token)
+    localStorage.setItem('user', JSON.stringify(user))
+    setUser(user)
   }
   
   async function logout() {
-    try {
-      // Call the logout endpoint to blacklist the token
-      await axios.post('/api/auth/logout')
-    } catch (error) {
-      console.error('Logout error:', error)
-    } finally {
-      localStorage.removeItem('token')
-      localStorage.removeItem('refreshToken')
-      setUser(null)
-    }
-  }
-  
-  async function refreshToken(): Promise<boolean> {
-    try {
-      const refreshToken = localStorage.getItem('refreshToken')
-      if (!refreshToken) return false
-      
-      const response = await axios.post('/api/auth/refresh', { token: refreshToken })
-      const { token, refreshToken: newRefreshToken, user: userData } = response.data
-      
-      localStorage.setItem('token', token)
-      localStorage.setItem('refreshToken', newRefreshToken)
-      setUser(userData)
-      
-      return true
-    } catch (error) {
-      console.error('Token refresh failed:', error)
-      localStorage.removeItem('token')
-      localStorage.removeItem('refreshToken')
-      setUser(null)
-      return false
-    }
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    setUser(null)
   }
 
-  return <AuthContext.Provider value={{ user, loading, login, signup, logout, refreshToken }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ user, loading, login, signup, logout }}>{children}</AuthContext.Provider>
 }
 
-export function useAuth() { return useContext(AuthContext) }
+export function useAuth() { 
+  return useContext(AuthContext) 
+}
 
 

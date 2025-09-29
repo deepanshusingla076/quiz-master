@@ -1,0 +1,11 @@
+C:\Users\deepa\OneDrive\Desktop\last\quiz-master\microservices\auth-service\src\main\java\com\example\quiz\auth\AuthServiceApplication.java
+C:\Users\deepa\OneDrive\Desktop\last\quiz-master\microservices\auth-service\src\main\java\com\example\quiz\auth\config\SecurityConfig.java
+C:\Users\deepa\OneDrive\Desktop\last\quiz-master\microservices\auth-service\src\main\java\com\example\quiz\auth\controller\AuthController.java
+C:\Users\deepa\OneDrive\Desktop\last\quiz-master\microservices\auth-service\src\main\java\com\example\quiz\auth\domain\Role.java
+C:\Users\deepa\OneDrive\Desktop\last\quiz-master\microservices\auth-service\src\main\java\com\example\quiz\auth\domain\User.java
+C:\Users\deepa\OneDrive\Desktop\last\quiz-master\microservices\auth-service\src\main\java\com\example\quiz\auth\dto\AuthResponse.java
+C:\Users\deepa\OneDrive\Desktop\last\quiz-master\microservices\auth-service\src\main\java\com\example\quiz\auth\dto\LoginRequest.java
+C:\Users\deepa\OneDrive\Desktop\last\quiz-master\microservices\auth-service\src\main\java\com\example\quiz\auth\dto\SignupRequest.java
+C:\Users\deepa\OneDrive\Desktop\last\quiz-master\microservices\auth-service\src\main\java\com\example\quiz\auth\repository\UserRepository.java
+C:\Users\deepa\OneDrive\Desktop\last\quiz-master\microservices\auth-service\src\main\java\com\example\quiz\auth\service\AuthService.java
+C:\Users\deepa\OneDrive\Desktop\last\quiz-master\microservices\auth-service\src\main\java\com\example\quiz\auth\service\JwtService.java

@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   --bg: #fffef7;
   --fg: #0a0a0a;
@@ -138,6 +142,110 @@ body {
   padding: 12px 16px;
   font-weight: 800;
   cursor: pointer;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.1s ease;
+}
+
+.btn:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 4px 4px 0 var(--fg);
+}
+
+.btn:active {
+  transform: translate(4px, 4px);
+  box-shadow: 2px 2px 0 var(--fg);
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+}
+
+.btn-danger {
+  background: #ff4444;
+  color: white;
+}
+
+.card {
+  background: var(--card-bg);
+  border: 3px solid var(--fg);
+  box-shadow: 6px 6px 0 var(--fg);
+  padding: 16px;
+}
+
+.card.brutal {
+  border: 3px solid var(--fg);
+  box-shadow: 6px 6px 0 var(--fg);
+}
+
+.input {
+  background: var(--card-bg);
+  color: var(--text-primary);
+  border: 3px solid var(--fg);
+  padding: 12px 16px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.input.brutal {
+  border: 3px solid var(--fg);
+  box-shadow: 4px 4px 0 var(--fg);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 4px 4px 0 var(--accent);
+}
+
+.quiz-row {
+  padding: 12px;
+  border: 2px solid var(--fg);
+  margin-bottom: 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.1s ease;
+}
+
+.quiz-row:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 3px 3px 0 var(--fg);
+}
+
+.quiz-row.selected {
+  background: var(--muted);
+  border-color: var(--accent);
+  box-shadow: 4px 4px 0 var(--accent);
+}
+
+.quiz-info {
+  flex: 1;
+}
+
+.quiz-title {
+  font-weight: 700;
+  margin-bottom: 4px;
+  font-size: 16px;
+}
+
+.quiz-difficulty {
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  padding: 2px 6px;
+  display: inline-block;
+  margin-bottom: 4px;
+}
+
+.quiz-actions {
+  display: flex;
+  gap: 8px;
 }
 
 .container { max-width: 1200px; margin: 0 auto; padding: 24px; }

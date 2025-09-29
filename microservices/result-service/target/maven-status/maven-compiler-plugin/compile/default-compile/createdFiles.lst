@@ -1,0 +1,14 @@
+com\example\quiz\result\domain\QuizAttempt$AttemptStatus.class
+com\example\quiz\result\domain\QuizAttempt.class
+com\example\quiz\result\client\QuestionBankClient$QuestionDto.class
+com\example\quiz\result\client\QuestionBankClient$QuizDto.class
+com\example\quiz\result\controller\ResultController.class
+com\example\quiz\result\ResultServiceApplication.class
+com\example\quiz\result\dto\QuizSubmissionRequest.class
+com\example\quiz\result\dto\AttemptResponse.class
+com\example\quiz\result\client\QuestionBankClient$OptionDto.class
+com\example\quiz\result\repository\QuizAttemptRepository.class
+com\example\quiz\result\domain\StudentAnswer.class
+com\example\quiz\result\service\ResultService.class
+com\example\quiz\result\client\QuestionBankClient.class
+com\example\quiz\result\dto\QuizSubmissionRequest$AnswerRequest.class

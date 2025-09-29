@@ -64,9 +64,22 @@ public class AttemptService {
         return attemptRepository.findByStudent(student);
     }
 
+    public boolean hasStudentAttemptedQuiz(User student, Long quizId) {
+        return attemptRepository.existsByStudentAndQuizId(student, quizId);
+    }
+
+    public Optional<Attempt> getStudentAttemptForQuiz(User student, Long quizId) {
+        return attemptRepository.findByStudentAndQuizId(student, quizId);
+    }
+
     public Attempt submitAttempt(Long quizId, User student, List<Long> answers) {
         Quiz quiz = quizRepository.findById(quizId)
             .orElseThrow(() -> new RuntimeException("Quiz not found"));
+        
+        // Check if student has already attempted this quiz
+        if (attemptRepository.existsByStudentAndQuiz(student, quiz)) {
+            throw new RuntimeException("Student has already attempted this quiz. Multiple attempts are not allowed.");
+        }
         
         // Calculate score based on answers
         int score = calculateScore(quizId, answers);
